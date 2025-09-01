@@ -1,0 +1,30 @@
+[package]
+name = "tario"
+description = "Asynchronously read and write TAR archives"
+authors = ["Akis Kesoglou <akiskesoglou@gmail.com"]
+license = "MIT"
+repository = "https://github.com/dfunckt/tario"
+keywords = ["tar", "async", "io", "futures", "tokio"]
+categories = ["asynchronous", "encoding", "filesystem"] # TODO: "no-std::no-alloc", "wasm"
+
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+futures-core = { version = "0.3", optional = true, default-features = false, features = ["std"] }
+futures-util = { version = "0.3", optional = true, default-features = false, features = ["std", "sink"] }
+pin-project-lite = { version = "0.2", default-features = false }
+tar = { version = "0.4", default-features = false }
+thiserror = { version = "2", default-features = false, features = ["std"] }
+tokio = { version = "1", default-features = false }
+
+[dev-dependencies]
+rand = { version = "0.9", default-features = false, features = ["thread_rng"] }
+tokio = { version = "1", default-features = false, features = ["rt", "fs", "macros", "io-util"] }
+
+[features]
+default = ["streams"]
+streams = ["dep:futures-core", "dep:futures-util"]
+
+[package.metadata.docs.rs]
+all-features = true
