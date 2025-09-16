@@ -282,9 +282,9 @@ impl<W: AsyncWrite + Unpin> Entry<'_, W> {
 pub use tar as sync;
 
 // enables cheap print debugging
-#[cfg(debug_assertions)]
+#[cfg(feature = "tracing")]
 const TRACING_ENABLED: bool = true;
-#[cfg(not(debug_assertions))]
+#[cfg(not(feature = "tracing"))]
 const TRACING_ENABLED: bool = false;
 
 #[cfg(test)]
