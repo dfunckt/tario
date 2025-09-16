@@ -75,12 +75,7 @@ jobs:
 
   docs:
     name: docs
-    runs-on: ${{ matrix.run.os }}
-    strategy:
-      matrix:
-        run:
-          - os: windows-latest
-          - os: ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       - name: Install Rust
