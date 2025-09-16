@@ -7,7 +7,7 @@ repository = "https://github.com/dfunckt/tario"
 keywords = ["tar", "async", "io", "futures", "tokio"]
 categories = ["asynchronous", "encoding", "filesystem"] # TODO: "no-std::no-alloc", "wasm"
 
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 
 [dependencies]
