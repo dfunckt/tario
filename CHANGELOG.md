@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.1.2 (2025-09-23)
+
+- Drop dependency on `thiserror` (#8)
 
 ## v0.1.1 (2025-09-16)
 
