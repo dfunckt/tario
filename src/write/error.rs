@@ -1,15 +1,11 @@
+use std::fmt;
 use std::io::{Error as IoError, ErrorKind, Result};
 use std::task::Poll;
 
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug)]
 pub enum WriteError {
-    #[error("expecting more data for entry; expected = {expected}, received = {received}")]
     UnexpectedEof { expected: u64, received: u64 },
-
-    #[error("failed to write the buffered data")]
     WriteZero,
-
-    #[error("cannot write new entry while another is being written")]
     OverlappingEntry,
 }
 
@@ -20,6 +16,23 @@ impl WriteError {
             Self::UnexpectedEof { .. } => ErrorKind::UnexpectedEof,
             Self::WriteZero => ErrorKind::WriteZero,
             Self::OverlappingEntry => ErrorKind::Unsupported,
+        }
+    }
+}
+
+impl std::error::Error for WriteError {}
+
+impl fmt::Display for WriteError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::UnexpectedEof { expected, received } => format!(
+                "expecting more data for entry; expected = {expected}, received = {received}"
+            )
+            .fmt(f),
+            Self::WriteZero => "failed to write the buffered data".fmt(f),
+            Self::OverlappingEntry => {
+                "cannot write new entry while another is being written".fmt(f)
+            }
         }
     }
 }

@@ -1,9 +1,9 @@
+use std::fmt;
 use std::io::{Error as IoError, ErrorKind, Result};
 use std::task::Poll;
 
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug)]
 pub enum ReadError {
-    #[error("expecting more data for entry; expected = {expected}, received = {received}")]
     UnexpectedEof { expected: usize, received: usize },
 }
 
@@ -12,6 +12,19 @@ impl ReadError {
     pub fn kind(&self) -> ErrorKind {
         match self {
             Self::UnexpectedEof { .. } => ErrorKind::UnexpectedEof,
+        }
+    }
+}
+
+impl std::error::Error for ReadError {}
+
+impl fmt::Display for ReadError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::UnexpectedEof { expected, received } => format!(
+                "expecting more data for entry; expected = {expected}, received = {received}"
+            )
+            .fmt(f),
         }
     }
 }
