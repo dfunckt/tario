@@ -15,7 +15,6 @@ futures-core = { version = "0.3", optional = true, default-features = false, fea
 futures-util = { version = "0.3", optional = true, default-features = false, features = ["std", "sink"] }
 pin-project-lite = { version = "0.2", default-features = false }
 tar = { version = "0.4", default-features = false }
-thiserror = { version = "2", default-features = false, features = ["std"] }
 tokio = { version = "1", default-features = false }
 
 [dev-dependencies]

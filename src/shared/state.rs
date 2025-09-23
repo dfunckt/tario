@@ -1,18 +1,14 @@
+use std::fmt;
 use std::io::{Error as IoError, ErrorKind, Result};
 
 use crate::TRACING_ENABLED;
 
 use super::block::{BLOCK_SIZE, Header};
 
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug)]
 pub enum Error {
-    #[error("expecting header")]
     ExpectingHeader,
-
-    #[error("expecting empty block")]
     ExpectingEmptyBlock,
-
-    #[error("cannot process data after eof")]
     Eof,
 }
 
@@ -20,6 +16,18 @@ impl Error {
     #[inline]
     pub fn kind(&self) -> ErrorKind {
         ErrorKind::InvalidData
+    }
+}
+
+impl std::error::Error for Error {}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::ExpectingHeader => "expecting header".fmt(f),
+            Self::ExpectingEmptyBlock => "expecting empty block".fmt(f),
+            Self::Eof => "cannot process data after eof".fmt(f),
+        }
     }
 }
 
