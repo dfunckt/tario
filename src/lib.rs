@@ -246,7 +246,7 @@ impl<'a, T> Entry<'a, T> {
 
     /// Returns the pathname of this entry, with any `\` characters converted
     /// to directory separators.
-    pub fn path(&self) -> Cow<[u8]> {
+    pub fn path(&self) -> Cow<'_, [u8]> {
         self.header.path_bytes()
     }
 
