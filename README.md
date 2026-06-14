@@ -27,7 +27,6 @@ Tario is:
 [crates-url]: https://crates.io/crates/tario
 [mit-badge]: https://img.shields.io/badge/license-MIT-blue.svg
 [mit-url]: https://github.com/dfunckt/tario/blob/master/LICENSE
-[actions-badge]: https://github.com/dfunckt/tario/workflows/ci/badge.svg
 [actions-badge]: https://github.com/dfunckt/tario/actions/workflows/ci.yml/badge.svg?branch=main
 [actions-url]: https://github.com/dfunckt/tario/actions?query=workflow%3Aci+branch%3Amain
 
@@ -46,14 +45,6 @@ Or manually by editing your project's Cargo.toml:
 [dependencies]
 tario = 0.1
 ```
-
-### Crate features
-
-Tario currently has the following feature switches:
-
-- `streams`: support for [Streams]. Enabled by default.
-
-[Streams]: https://docs.rs/futures/latest/futures/stream/index.html
 
 
 ## Usage
