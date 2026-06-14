@@ -58,32 +58,6 @@ async fn basic() {
     }
 }
 
-#[cfg(feature = "streams")]
-#[tokio::test]
-async fn stream() {
-    use futures_util::StreamExt;
-
-    let data = make_archive_data(&FILES);
-
-    for cap in [1, 10] {
-        let io = io::Cursor::new(data.as_slice());
-        let mut archive = Archive::with_capacity(io, NonZeroUsize::new(cap).unwrap());
-        let mut entries = archive.entries();
-        let mut i = 0;
-
-        while let Some(res) = entries.next().await {
-            let (path, size) = FILES[i];
-            let mut entry = res.unwrap();
-            assert_eq!(entry.path_lossy(), path.to_owned());
-            assert_eq!(entry.len(), size as u64);
-            entry.skip().await.unwrap();
-            i += 1;
-        }
-
-        assert!(archive.next_entry().await.unwrap().is_none());
-    }
-}
-
 #[tokio::test]
 async fn ignore_entry_data() {
     let data = make_archive_data(&FILES);
@@ -116,7 +90,7 @@ async fn expect_eof(data: &[u8], cap: usize, offset: usize) {
 
 #[tokio::test]
 async fn unexpected_eof_at_random_position() {
-    use rand::Rng;
+    use rand::RngExt;
 
     let data = make_archive_data(&FILES);
 

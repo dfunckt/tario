@@ -3,8 +3,6 @@ use std::mem;
 use std::pin::Pin;
 use std::task::{Context, Poll, ready};
 
-#[cfg(feature = "streams")]
-use futures_core::Stream;
 use tokio::io::{AsyncBufRead, AsyncRead, ReadBuf};
 
 use crate::shared::block::{Block, Header};
@@ -14,8 +12,6 @@ use crate::shared::state::State;
 
 use crate::{Archive, BLOCK_SIZE, Entry, TRACING_ENABLED};
 
-mod error;
-pub use self::error::ReadError;
 
 impl<R: AsyncRead> Archive<R> {
     /// Reads from the source object and fills the internal buffer, until one
@@ -315,41 +311,6 @@ where
             Poll::Ready(Ok(Some(entry)))
         } else {
             Poll::Ready(Ok(None))
-        }
-    }
-}
-
-#[cfg(feature = "streams")]
-#[derive(Debug)]
-pub struct Entries<'a, R>(&'a mut Archive<R>);
-
-#[cfg(feature = "streams")]
-impl<'a, R> Entries<'a, R> {
-    pub(super) fn new(archive: &'a mut Archive<R>) -> Self {
-        Self(archive)
-    }
-}
-
-#[cfg(feature = "streams")]
-impl<'a, R: AsyncRead + Unpin> Stream for Entries<'a, R> {
-    type Item = Result<Entry<'a, R>>;
-
-    fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
-        let mut pin = unsafe {
-            // The original Archive exists elsewhere and is guaranteed to
-            // have a stable location for 'a. Besides, we are only polling
-            // it through the reference and never move the value.
-            self.map_unchecked_mut(|s| s.0)
-        };
-
-        if let Some(entry) = ready!(pin.as_mut().poll_next_entry(cx))? {
-            let entry = unsafe {
-                // We have an exclusive reference for 'a.
-                mem::transmute::<Entry<'_, R>, Entry<'a, R>>(entry)
-            };
-            Poll::Ready(Some(Ok(entry)))
-        } else {
-            Poll::Ready(None)
         }
     }
 }

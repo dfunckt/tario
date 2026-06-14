@@ -88,13 +88,10 @@ mod shared;
 pub use shared::block::{BLOCK_SIZE, Header};
 
 mod read;
-pub use read::ReadError;
 
 mod write;
 pub use write::WriteError;
 
-#[cfg(feature = "streams")]
-use read::Entries;
 use read::NextEntry;
 use shared::buffer::Buf;
 use shared::state::State;
@@ -153,34 +150,6 @@ impl<R: AsyncRead + Unpin> Archive<R> {
     #[inline]
     pub fn next_entry(&mut self) -> NextEntry<'_, R> {
         NextEntry::new(self)
-    }
-
-    /// Returns a stream yielding [entries][Entry] until EOF is reached.
-    ///
-    /// This is only available when the `streams` feature is enabled.
-    ///
-    /// A TAR byte stream is a series of entries in order, so working with
-    /// multiple entries concurrently is not possible -- their data cannot be
-    /// interleaved. The compiler will helpfully prevent you from doing that,
-    /// so the following does not compile:
-    ///
-    /// ```compile_fail
-    /// use std::io;
-    /// use futures_util::StreamExt;
-    /// use tario::Archive;
-    ///
-    /// let io = io::Cursor::new(&[]);
-    /// let mut archive = Archive::new(io);
-    /// let mut entries = archive.entries();
-    /// let entry1 = entries.next();
-    /// let entry2 = entries.next();
-    /// entry1;
-    /// // error[E0499]: cannot borrow `archive` as mutable more than once at a time
-    /// ```
-    #[cfg(feature = "streams")]
-    #[inline]
-    pub fn entries(&mut self) -> Entries<'_, R> {
-        Entries::new(self)
     }
 }
 
@@ -246,7 +215,7 @@ impl<'a, T> Entry<'a, T> {
 
     /// Returns the pathname of this entry, with any `\` characters converted
     /// to directory separators.
-    pub fn path(&self) -> Cow<[u8]> {
+    pub fn path(&self) -> Cow<'_, [u8]> {
         self.header.path_bytes()
     }
 
@@ -297,12 +266,10 @@ fn assert_autotraits() {
     fn is_send<T: Send>() {}
     is_send::<Archive<()>>();
     is_send::<Entry<()>>();
-    is_send::<ReadError>();
     is_send::<WriteError>();
 
     fn is_sync<T: Sync>() {}
     is_sync::<Archive<()>>();
     is_sync::<Entry<()>>();
-    is_sync::<ReadError>();
     is_sync::<WriteError>();
 }

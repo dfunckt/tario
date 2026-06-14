@@ -7,7 +7,7 @@ pub trait IterBuffers {
 }
 
 pub trait IterSlices {
-    fn iter_slices(&self) -> impl Iterator<Item = &IoSlice>;
+    fn iter_slices(&self) -> impl Iterator<Item = &IoSlice<'_>>;
 }
 
 pub trait IterSlicesExt {
@@ -19,10 +19,10 @@ pub trait IntoBuffersIterator {
 }
 
 pub trait Slices: IterSlices + IterBuffers {
-    fn as_prefix(&self) -> Prefix;
-    fn split_at_index(&self, index: usize, offset: usize) -> (Prefix, Suffix);
+    fn as_prefix(&self) -> Prefix<'_>;
+    fn split_at_index(&self, index: usize, offset: usize) -> (Prefix<'_>, Suffix<'_>);
 
-    fn split_at_byte_offset(&self, offset: usize) -> (Prefix, Suffix) {
+    fn split_at_byte_offset(&self, offset: usize) -> (Prefix<'_>, Suffix<'_>) {
         let mut rem = offset;
 
         self.iter_slices()
@@ -46,14 +46,14 @@ pub trait Slices: IterSlices + IterBuffers {
     }
 
     #[inline]
-    fn take_prefix(&self, len: usize) -> Prefix {
+    fn take_prefix(&self, len: usize) -> Prefix<'_> {
         self.split_at_byte_offset(len).0
     }
 }
 
 impl<'a> IterSlices for &'a [IoSlice<'a>] {
     #[inline]
-    fn iter_slices(&self) -> impl Iterator<Item = &IoSlice> {
+    fn iter_slices(&self) -> impl Iterator<Item = &IoSlice<'_>> {
         self.iter()
     }
 }
@@ -67,11 +67,11 @@ impl<'a> IterBuffers for &'a [IoSlice<'a>] {
 
 impl<'a> Slices for &'a [IoSlice<'a>] {
     #[inline]
-    fn as_prefix(&self) -> Prefix {
+    fn as_prefix(&self) -> Prefix<'_> {
         Prefix::from_parts(self, &[])
     }
 
-    fn split_at_index(&self, index: usize, offset: usize) -> (Prefix, Suffix) {
+    fn split_at_index(&self, index: usize, offset: usize) -> (Prefix<'_>, Suffix<'_>) {
         let (prefix, suffix) = self.split_at(index);
         if offset == 0 {
             (
@@ -93,7 +93,7 @@ pub struct Prefix<'a>(SplitInner<'a>);
 
 impl IterSlices for Prefix<'_> {
     #[inline]
-    fn iter_slices(&self) -> impl Iterator<Item = &IoSlice> {
+    fn iter_slices(&self) -> impl Iterator<Item = &IoSlice<'_>> {
         self.0
             .slices()
             .iter()
@@ -110,11 +110,11 @@ impl IterBuffers for Prefix<'_> {
 
 impl<'a> Slices for Prefix<'a> {
     #[inline]
-    fn as_prefix(&self) -> Prefix {
+    fn as_prefix(&self) -> Prefix<'_> {
         Prefix::from_parts(self.slices(), self.remainder())
     }
 
-    fn split_at_index(&self, index: usize, offset: usize) -> (Prefix, Suffix) {
+    fn split_at_index(&self, index: usize, offset: usize) -> (Prefix<'_>, Suffix<'_>) {
         if index == self.0.slices().len() {
             // index points to our remainder buffer
             (
@@ -146,7 +146,7 @@ pub struct Suffix<'a>(SplitInner<'a>);
 
 impl IterSlices for Suffix<'_> {
     #[inline]
-    fn iter_slices(&self) -> impl Iterator<Item = &IoSlice> {
+    fn iter_slices(&self) -> impl Iterator<Item = &IoSlice<'_>> {
         self.0
             .remainder_slices()
             .iter()
@@ -163,8 +163,8 @@ impl IterBuffers for Suffix<'_> {
 
 pub trait Split<'a>: IterSlices + IterBuffers {
     fn from_parts(slices: &'a [IoSlice], remainder: &'a [u8]) -> Self;
-    fn slices(&self) -> &[IoSlice];
-    fn remainder_slices(&self) -> &[IoSlice; 1];
+    fn slices(&self) -> &[IoSlice<'_>];
+    fn remainder_slices(&self) -> &[IoSlice<'_>; 1];
 
     #[inline]
     fn remainder(&self) -> &[u8] {
@@ -187,12 +187,12 @@ impl<'a> Split<'a> for Prefix<'a> {
     }
 
     #[inline]
-    fn slices(&self) -> &[IoSlice] {
+    fn slices(&self) -> &[IoSlice<'_>] {
         self.0.slices()
     }
 
     #[inline]
-    fn remainder_slices(&self) -> &[IoSlice; 1] {
+    fn remainder_slices(&self) -> &[IoSlice<'_>; 1] {
         self.0.remainder_slices()
     }
 }
@@ -204,12 +204,12 @@ impl<'a> Split<'a> for Suffix<'a> {
     }
 
     #[inline]
-    fn slices(&self) -> &[IoSlice] {
+    fn slices(&self) -> &[IoSlice<'_>] {
         self.0.slices()
     }
 
     #[inline]
-    fn remainder_slices(&self) -> &[IoSlice; 1] {
+    fn remainder_slices(&self) -> &[IoSlice<'_>; 1] {
         self.0.remainder_slices()
     }
 }
@@ -218,12 +218,12 @@ impl<'a> Split<'a> for Suffix<'a> {
 struct SplitInner<'a>(&'a [IoSlice<'a>], [IoSlice<'a>; 1]);
 impl SplitInner<'_> {
     #[inline]
-    fn slices(&self) -> &[IoSlice] {
+    fn slices(&self) -> &[IoSlice<'_>] {
         self.0
     }
 
     #[inline]
-    fn remainder_slices(&self) -> &[IoSlice; 1] {
+    fn remainder_slices(&self) -> &[IoSlice<'_>; 1] {
         &self.1
     }
 }
@@ -266,6 +266,7 @@ where
 }
 
 #[derive(Debug, Clone, Copy)]
+#[expect(unused)] // adopt soon
 pub struct TakeBytesLen<I>(I, usize);
 impl<'a, I> Iterator for TakeBytesLen<I>
 where
@@ -296,6 +297,7 @@ where
 }
 
 #[derive(Debug, Clone, Copy)]
+#[expect(unused)] // adopt soon
 pub struct SkipBytesLen<I>(I, usize);
 impl<'a, I> Iterator for SkipBytesLen<I>
 where
