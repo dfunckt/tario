@@ -1,13 +1,13 @@
 [package]
 name = "tario"
 description = "Asynchronously read and write TAR archives"
-authors = ["Akis Kesoglou <akiskesoglou@gmail.com"]
+authors = ["Akis Kesoglou <akiskesoglou@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/dfunckt/tario"
 keywords = ["tar", "async", "io", "futures", "tokio"]
 categories = ["asynchronous", "encoding", "filesystem"]    # TODO: "no-std::no-alloc", "wasm"
 
-version = "0.1.2"
+version = "0.2.0"
 edition = "2024"
 
 [dependencies]
