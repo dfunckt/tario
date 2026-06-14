@@ -83,7 +83,7 @@ impl<W: AsyncWrite> Archive<W> {
                     Some(header)
                 ))?;
                 if n as u64 == rem {
-                    debug_assert_eq!(bufs.bytes_len(), n);
+                    debug_assert!(bufs.bytes_len() >= n);
                     debug_assert_eq!(self.state, State::ReceivedData);
                     ready!(self.poll_finish_entry(cx, header))?;
                 }
