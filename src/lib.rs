@@ -88,7 +88,6 @@ mod shared;
 pub use shared::block::{BLOCK_SIZE, Header};
 
 mod read;
-pub use read::ReadError;
 
 mod write;
 pub use write::WriteError;
@@ -297,12 +296,10 @@ fn assert_autotraits() {
     fn is_send<T: Send>() {}
     is_send::<Archive<()>>();
     is_send::<Entry<()>>();
-    is_send::<ReadError>();
     is_send::<WriteError>();
 
     fn is_sync<T: Sync>() {}
     is_sync::<Archive<()>>();
     is_sync::<Entry<()>>();
-    is_sync::<ReadError>();
     is_sync::<WriteError>();
 }

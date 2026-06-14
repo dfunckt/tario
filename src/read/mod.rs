@@ -14,8 +14,6 @@ use crate::shared::state::State;
 
 use crate::{Archive, BLOCK_SIZE, Entry, TRACING_ENABLED};
 
-mod error;
-pub use self::error::ReadError;
 
 impl<R: AsyncRead> Archive<R> {
     /// Reads from the source object and fills the internal buffer, until one
