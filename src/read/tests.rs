@@ -116,7 +116,7 @@ async fn expect_eof(data: &[u8], cap: usize, offset: usize) {
 
 #[tokio::test]
 async fn unexpected_eof_at_random_position() {
-    use rand::Rng;
+    use rand::RngExt;
 
     let data = make_archive_data(&FILES);
 

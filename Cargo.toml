@@ -5,7 +5,7 @@ authors = ["Akis Kesoglou <akiskesoglou@gmail.com"]
 license = "MIT"
 repository = "https://github.com/dfunckt/tario"
 keywords = ["tar", "async", "io", "futures", "tokio"]
-categories = ["asynchronous", "encoding", "filesystem"] # TODO: "no-std::no-alloc", "wasm"
+categories = ["asynchronous", "encoding", "filesystem"]    # TODO: "no-std::no-alloc", "wasm"
 
 version = "0.1.2"
 edition = "2024"
@@ -18,7 +18,7 @@ tar = { version = "0.4", default-features = false }
 tokio = { version = "1", default-features = false }
 
 [dev-dependencies]
-rand = { version = "0.9", default-features = false, features = ["thread_rng"] }
+rand = { version = "0.10", default-features = false, features = ["thread_rng"] }
 tokio = { version = "1", default-features = false, features = ["rt", "fs", "macros", "io-util"] }
 
 [features]
