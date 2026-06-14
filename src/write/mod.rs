@@ -85,8 +85,7 @@ impl<W: AsyncWrite> Archive<W> {
                 if n as u64 == rem {
                     debug_assert_eq!(bufs.bytes_len(), n);
                     debug_assert_eq!(self.state, State::ReceivedData);
-                    let res = ready!(self.poll_finish_entry(cx, header));
-                    debug_assert!(res.is_ok());
+                    ready!(self.poll_finish_entry(cx, header))?;
                 }
                 Poll::Ready(Ok(n))
             }
